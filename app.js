@@ -1,6 +1,6 @@
-import compression from "compression";
-import express from "express";
-import helmet from "helmet";
+const compression = require("compression");
+const express = require("express");
+const helmet = require("helmet");
 const port = parseInt(process.env.PORT, 10) || 8000;
 const cwd = process.cwd();
 
