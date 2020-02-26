@@ -4,10 +4,27 @@
 <link rel="stylesheet" href="assets/style.css" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="application-name" content="MarcosPay" />
-<title>marcospay.com - A Basic Card implementation</title>
+<title>A Payment Handler Implementation</title>
 <main>
   <h1>💸 Welcome to Marcos Pay 💸</h1>
 </main>
+<p id="support"></p>
+<script>
+  class PaymentInstrumentForm extends HTMLFormElement {
+    constructor() {
+      super();
+    }
+  }
+
+  customElements.define("moz-instrument", PaymentInstrumentForm, {
+    extends: "form",
+  });
+</script>
+
+<form onsubmit="return false">
+  <button onclick="registerInstrument()">Add payment instrument</button>
+</form>
+
 <aside id="update-toast">
   <p>
     Site has been updated!
@@ -15,11 +32,57 @@
     <button id="dismiss">No thanks!</button>
   </p>
 </aside>
-
 <script>
-  window.onload = async () => {
+  async function registerInstrument(){
+    const { paymentManager } = await navigator.serviceWorker.getRegistration("sw.js");
+    await paymentManager.instruments.set("12345",
+      {
+      name: "Visa ****1111",
+      icons: [{
+        src: "/icons/visa.png",
+        sizes: "512x355",
+        type: "image/png",
+      }],
+      method: "basic-card",
+      capabilities: {
+        supportedNetworks: ["visa"],
+        supportedTypes: ["credit"],
+      },
+    });
+    await paymentManager.instruments.set("marcos-money",
+      {
+      name: "Magic",
+      icons: [{
+        src: "/icons/visa.png",
+        sizes: "512x355",
+        type: "image/png",
+      }],
+      method: "https://marcospay.com",
+    });
+    await paymentManager.instruments.set("marcos-money",
+      {
+      name: "Localhost",
+      icons: [{
+        src: "/icons/visa.png",
+        sizes: "512x355",
+        type: "image/png",
+      }],
+      method: "https://Localhost:8000",
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", async () => {
+    if ("paymentManager" in ServiceWorkerRegistration.prototype === false) {
+      const support = document.getElementById("support");
+      support.innerHTML = "Browser doesn't support Payment Handler";
+      return;
+    }
+    await doServiceWorkerRegistration();
+  });
+  async function doServiceWorkerRegistration() {
     const reg = await navigator.serviceWorker.register("sw.js");
 
+    // Normal Service worker registration stuff...
     if (!navigator.serviceWorker.controller) {
       return;
     }
@@ -67,5 +130,6 @@
         });
       };
     }
-  };
+  }
 </script>
+<div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>

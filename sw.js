@@ -1,6 +1,7 @@
 const SITE_CACHE = "site-v1";
 
 self.addEventListener("paymentrequest", e => {
+  console.log("Payment Request event")
   e.respondWith(handlePaymentResponse(e));
 });
 
@@ -13,16 +14,23 @@ async function handlePaymentResponse(event) {
 
 // Service worker lifecycle management below...
 self.addEventListener("install", ev => {
-  ev.waitUntil(cacheIsPopulated());
+  ev.waitUntil(populateCache());
 });
 
-async function cacheIsPopulated() {
+async function populateCache() {
+  const keys = await caches.keys();
+
+  for (const key of keys) {
+    await caches.delete(key);
+  }
+
   const resources = [
-    "./",
-    "./assets/style.css",
-    "./icons/icon.png",
-    "./icons/icon200.png",
-    "./manifest.json",
+    "/",
+    "/assets/style.css",
+    "/icons/icon_200.png",
+    "/icons/icon.png",
+    "/icons/visa.png",
+    "/manifest.json",
   ];
   const cache = await caches.open(SITE_CACHE);
   await cache.addAll(resources);
@@ -36,7 +44,6 @@ self.addEventListener("activate", async () => {
 self.addEventListener("fetch", ev => {
   ev.respondWith(aCachedResponse(ev));
 });
-
 
 async function aCachedResponse(ev) {
   const response = await caches.match(ev.request);
@@ -69,4 +76,3 @@ self.addEventListener("message", event => {
       console.error("Unhandled message", event);
   }
 });
-

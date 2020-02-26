@@ -1,0 +1,7 @@
+{
+  "default_applications": ["https://marcospay.com/manifest.json"],
+  "supported_origins": [
+    "https://localhost:8080",
+    "https://marcoscaceres.github.io"
+  ]
+}

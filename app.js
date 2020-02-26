@@ -6,11 +6,21 @@ const cwd = process.cwd();
 
 const app = express();
 app.use(compression());
-app.use(express.static(cwd));
 
 // Defaults https://www.npmjs.com/package/helmet#how-it-works
-app.use(helmet({
-  frameguard: false, // Allow for UI inclusion as iframe for testing.
-}));
+app.use(
+  helmet({
+    frameguard: false, // Allow for UI inclusion as iframe for testing.
+  }),
+);
+
+app.get("/", (req, res, next) => {
+  if (req.method === "HEAD") {
+    res.setHeader("Link", '<payment-manifest.json>; rel="payment-method-manifest"');
+  }
+  next();
+});
+
+app.use(express.static(cwd));
 
 app.listen(port, () => console.log(`Listening on port ${port}!`));
